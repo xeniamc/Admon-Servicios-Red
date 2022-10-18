@@ -72,18 +72,18 @@ def addAgent():
     file = open("agentes.txt", "a")
 
     index = len(agents)
-
+    '''
     print(f'Ingresa la información del nuevo agente no. {index}:')
     ip_hostname = input('IP/Hostname:')
     community = input('Comunidad:')
     port = int(input('Puerto:'))
     version =  input('Version SNMP (v1,v2,v3): ')
     '''
-    ip_hostname = '192.168.1.127'
+    ip_hostname = 'localhost'
     port = 161
-    community = 'comunidadASR'
+    community = 'comunidadASRWin'
     version = 'v1'
-    '''
+
     agents[index] = [ip_hostname, community, port, version]
     file.write(ip_hostname + ',' + community + ',' + str(port) + ',' + version +'\n')
     file.close()
@@ -152,13 +152,23 @@ def createPDFReport(agent):
 
     pdfReport.setFont('Helvetica-Bold', 12)
     pdfReport.drawString(w - 562, h - 150, 'Sistema Operativo: ')
-    sistema = consultaSNMP(agent[0], agent[1], agent[2], '1.3.6.1.2.1.1.1.0')
+    info = consultaSNMP(agent[0], agent[1], agent[2], '1.3.6.1.2.1.1.1.0')
+
+    sistema = []
+    info_list = info.split()
+    for i in range(0, len(info_list), 1):
+        if info_list[i] == 'Linux' or info_list[i] == 'Windows' or info_list[i].endswith('Ubuntu'):
+            sistema.append(info_list[i])
+    for sis in sistema:
+        sis = sis + ' '
+
     pdfReport.setFont('Helvetica', 10)
-    pdfReport.drawString(w - 450, h - 150, f'{sistema}')
-    if sistema == 'Linux' :
+    pdfReport.drawString(w - 450, h - 150,f'{sis}')
+
+    if sistema[0] == 'Linux' :
         pdfReport.drawImage("sistema-logos/ubuntu-logo.png", w-150, h - 230, width=100,height=100)
-    if sistema == 'Windows' :
-        pdfReport.drawImage("sistema-logos/win-logo.png", w - 150, h - 230, width=100, height=100)
+    if sistema[0] == 'Windows' :
+        pdfReport.drawImage("sistema-logos/win-logo.jpeg", w - 150, h - 230, width=100, height=100)
 
     pdfReport.setFont('Helvetica-Bold', 12)
     pdfReport.drawString(w - 562, h - 170, 'Nombre del dispositivo: ')
@@ -191,34 +201,35 @@ def createPDFReport(agent):
     pdfReport.drawString(w - 450, h - 230, f'{no_inter}')
 
 
-    xlist = [153,306,459]
+    xlist = [50,500,562]
     ylist = []
     ylist_newpage = []
     y = 522
-    padding = 13
+    padding = 10
 
     pdfReport.grid(xlist,[542,522])
-    pdfReport.drawCentredString(229, 542 - padding, 'Interfaz')
-    pdfReport.drawCentredString(382, 542 - padding, 'Estado')
+    pdfReport.setFont('Helvetica-Bold', 12)
+    pdfReport.drawCentredString(178, 542 - padding - 5, 'Interfaz')
+    pdfReport.drawCentredString(531, 542 - padding - 5, 'Estado')
+    pdfReport.setFont('Helvetica', 10)
 
-    for i in range(1, int(no_inter) + 2, 1):
-        if i < 26:
-            ylist.append(y)
-            y = y - 20
-        else:
-            if i == 26:
-                y = h - 50
-            y = y - 20
-            ylist_newpage.append(y)
-        if i <= int(no_inter) :
+    for i in range(1, 7, 1):
+        ylist.append(y)
+        y = y - 20
+    for i in range(1,6,1):
+        if i <= int(no_inter):
             inter_descr = consultaSNMP(agent[0], agent[1], agent[2], f'1.3.6.1.2.1.2.2.1.2.{i}')
-            pdfReport.drawString(xlist[0]+padding, y + 20 - padding, inter_descr)
+            pdfReport.drawString(xlist[0]+padding, ylist[i] + 15 - padding, inter_descr)
 
-            inter_state = consultaSNMP(agent[0], agent[1], agent[2], f'1.3.6.1.2.1.2.2.1.7.{i}')
-            pdfReport.drawString(xlist[1] + padding, y + 20 - padding, inter_state)
+            state = consultaSNMP(agent[0], agent[1], agent[2], f'1.3.6.1.2.1.2.2.1.7.{i}')
+            if state == '1':
+                state = 'Up'
+            elif state == '2':
+                state = 'Up'
+            else:
+                state = 'Testing'
+            pdfReport.drawString(xlist[1] + padding, ylist[i] + 15 - padding, state)
 
-
-    pdfReport.setStrokeColorRGB(0,0,0)
     pdfReport.grid(xlist,ylist)
 
     if ylist_newpage:
@@ -243,10 +254,8 @@ def consultaSNMP(host,community,port,oid):
     elif errorStatus:
         print('%s at %s' % (errorStatus.prettyPrint(),errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
     else:
-        for varBind in varBinds:
-            varB = (' = '.join([x.prettyPrint() for x in varBind]))
-            resultado = varB.split()[2]
-    return resultado
+        resultado = str(varBinds[0][1])
+        return resultado
 
 def close():
     print('Saliendo')
