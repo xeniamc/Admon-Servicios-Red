@@ -68,7 +68,7 @@ def addAgent():
     file = open("agentes.txt", "a")
 
     index = len(agents)
-    '''
+
     print(f'Ingresa la información del nuevo agente no. {index}:')
     ip_hostname = input('IP/Hostname:')
     community = input('Comunidad:')
@@ -79,7 +79,7 @@ def addAgent():
     port = 161
     community = 'comunidadASR'
     version = 'v1'
-
+    '''
     agents[index] = [ip_hostname, community, port, version]
     file.write(ip_hostname + ',' + community + ',' + str(port) + ',' + version +',\n')
     file.close()
@@ -158,8 +158,11 @@ def createPDFReport(agent):
         if info == 'Linux' or info == 'Windows' or info.endswith('Ubuntu'):
             sistema.append(info)
 
+    for s in sistema:
+        sis = s + ' '
+
     pdfReport.setFont('Helvetica', 10)
-    pdfReport.drawString(w - 450, h - 150,f'{sistema[0]} {sistema[1]}')
+    pdfReport.drawString(w - 450, h - 150,f'{sis}')
 
     if sistema[0] == 'Linux' :
         pdfReport.drawImage("sistema-logos/ubuntu-logo.png", w-150, h - 230, width=100,height=100)
@@ -221,7 +224,7 @@ def createPDFReport(agent):
             if state == '1':
                 state = 'Up'
             elif state == '2':
-                state = 'Up'
+                state = 'Down'
             else:
                 state = 'Testing'
             pdfReport.drawString(xlist[1] + padding, ylist[i] + 15 - padding, state)
