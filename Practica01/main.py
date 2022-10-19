@@ -1,4 +1,3 @@
-# This is a sample Python script.
 
 # Press Mayús+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
@@ -8,13 +7,10 @@
     UA: Administración de Servicios en Red | Grupo: 4CM13
     Martinez Cervantes Xenia Guadalupe
 '''
-import os
 from pysnmp.hlapi import *
 from reportlab.pdfgen import canvas
-from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.pdfbase import pdfmetrics
-from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
+from datetime import datetime
 
 agents = {}
 file = open("agentes.txt", "w+")
@@ -72,20 +68,20 @@ def addAgent():
     file = open("agentes.txt", "a")
 
     index = len(agents)
-    '''
+
     print(f'Ingresa la información del nuevo agente no. {index}:')
     ip_hostname = input('IP/Hostname:')
     community = input('Comunidad:')
     port = int(input('Puerto:'))
     version =  input('Version SNMP (v1,v2,v3): ')
     '''
-    ip_hostname = 'localhost'
+    ip_hostname = '192.168.1.127'
     port = 161
-    community = 'comunidadASRWin'
+    community = 'comunidadASR'
     version = 'v1'
-
+    '''
     agents[index] = [ip_hostname, community, port, version]
-    file.write(ip_hostname + ',' + community + ',' + str(port) + ',' + version +'\n')
+    file.write(ip_hostname + ',' + community + ',' + str(port) + ',' + version +',\n')
     file.close()
 
 
@@ -96,7 +92,7 @@ def deleteAgent():
     else:
         print('\tAGENTES EN LA LISTA:')
         for clave in agents:
-            print(f'Agente {clave}:  {agents[clave]}')
+            print(f'AGENTE {clave}:  {agents[clave][0]}, {agents[clave][1]}, {agents[clave][2]}, {agents[clave][3]}')
 
         while (del_agent := int(input('No. del agente que desea eliminar:'))) not in agents:
             print(f'El agente {del_agent} no existe. Intentelo otra vez.')
@@ -108,7 +104,7 @@ def deleteAgent():
             file = open("agentes.txt","w+")
             print(f'Se ha eliminado el agente {del_agent}: {agents.pop(del_agent)}')
             for valor in agents.values():
-                file.write(str(valor)+'\n')
+                file.write(valor[0]+','+valor[1]+','+valor[2]+','+valor[3]+',\n')
             file.close()
         else:
             print(f'Se cancelo la eliminacion del agente {del_agent}: {agents[del_agent][0]}')
@@ -123,7 +119,7 @@ def getReport():
     else:
         print('\tAGENTES EN LA LISTA:')
         for clave in agents:
-            print(f'Agente {clave}:' + str(agents[clave]))
+            print(f'AGENTE {clave}:  {agents[clave][0]}, {agents[clave][1]}, {agents[clave][2]}, {agents[clave][3]}')
 
         while (agent_report := int(input('No. del agente del que desea generar el reporte:'))) not in agents:
             print(f'El agente {agent_report} no existe. Intentelo otra vez.')
@@ -134,8 +130,10 @@ def getReport():
 
 def createPDFReport(agent):
     w, h = letter
-
-    pdfReport = canvas.Canvas('reportes/reporte_' + agent[0] + '.pdf', pagesize=letter)
+    date = datetime.now()
+    hr_min = str(date.time()).split(':')
+    time = hr_min[0]+hr_min[1]
+    pdfReport = canvas.Canvas('reportes/reporte_' + agent[0] + '_' + time +'.pdf', pagesize=letter)
 
     pdfReport.setFont('Times-Bold', 18)
     pdfReport.drawCentredString(w / 2, h - 50, 'ADMINISTRACIÓN DE SISTEMAS EN RED')
@@ -232,9 +230,8 @@ def createPDFReport(agent):
 
     pdfReport.grid(xlist,ylist)
 
-    if ylist_newpage:
-        pdfReport.showPage()
-        pdfReport.grid(xlist,ylist_newpage)
+    pdfReport.setFont('Helvetica-Bold', 8)
+    pdfReport.drawRightString(530,ylist.pop()-20,f'Fecha y hora del reporte:{date.strftime("%d %B, %Y %H:%M:%S")}')
 
     pdfReport.save()
     print('El reporte se ha generado existosamente!')
