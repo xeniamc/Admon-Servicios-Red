@@ -37,66 +37,43 @@ def createPDFReport(agent, session_id):
     pdfReport.drawString(w - 562, h - 220, f'rdate: {date.strftime("%d %b %Y %H:%M:%S")}')
 
     pdfReport.drawString(w - 562, h - 235, '#NAS-IP-Address')
-    pdfReport.drawString(w - 562, h - 250, '{info}')
+    pdfReport.drawString(w - 562, h - 250, f'{agent[0]}')
 
-    pdfReport.drawString(w - 562, h - 265, '#NAS-Port')
-    pdfReport.drawString(w - 562, h - 280, '{info}')
-
-    pdfReport.drawString(w - 562, h - 295, '#NAS-Port-Type')
-    pdfReport.drawString(w - 562, h - 310, '{info}')
-
-    pdfReport.drawString(w - 562, h - 325, '#User-name')
+    pdfReport.drawString(w - 562, h - 265, '#User-name')
     info = consultaSNMP(agent[0], agent[1], agent[2], '1.3.6.1.2.1.1.5.0')
-    pdfReport.drawString(w - 562, h - 340, f'{info}')
+    pdfReport.drawString(w - 562, h - 280, f'{info}')
 
-    pdfReport.drawString(w - 562, h - 355, '#Acct-Status-Type')
-    pdfReport.drawString(w - 562, h - 370, '{info}')
+    pdfReport.drawString(w - 562, h - 295, '#Acct-Input-Octets')
+    inoctets = consultaSNMP(agent[0], agent[1], agent[2], '1.3.6.1.2.1.2.2.1.10.41')
+    pdfReport.drawString(w - 562, h - 310, f'{inoctets}')
 
-    pdfReport.drawString(w - 562, h - 385, '#Acct-Delay-Time')
-    pdfReport.drawString(w - 562, h - 400, '{info}')
+    pdfReport.drawString(w - 562, h - 325, '#Acct-Output-Octets')
+    outoctets = consultaSNMP(agent[0], agent[1], agent[2], '1.3.6.1.2.1.2.2.1.16.41')
+    pdfReport.drawString(w - 562, h - 340, f'{outoctets}')
 
-    pdfReport.drawString(w - 562, h - 415, '#Acct-Input-Octets')
-    inoctets = consultaSNMP(agent[0], agent[1], agent[2], '1.3.6.1.2.1.2.2.1.10.1')
-    pdfReport.drawString(w - 562, h - 430, f'{inoctets}')
+    pdfReport.drawString(w - 562, h - 355, '#Acct-Session-Id')
+    pdfReport.drawString(w - 562, h - 370, f'{session_id}')
 
-    pdfReport.drawString(w - 562, h - 445, '#Acct-Output-Octets')
-    outoctets = consultaSNMP(agent[0], agent[1], agent[2], '1.3.6.1.2.1.2.2.1.16.1')
-    pdfReport.drawString(w - 562, h - 460, f'{outoctets}')
+    pdfReport.drawString(w - 562, h - 385, '#Acct-Session-Time')
+    info = consultaSNMP(agent[0], agent[1], agent[2], '1.3.6.1.2.1.1.3.0')
+    pdfReport.drawString(w - 562, h - 400, f'{info}')
 
-    pdfReport.drawString(w - 562, h - 475, '#Acct-Session-Id')
-    pdfReport.drawString(w - 562, h - 490, f'{session_id}')
+    pdfReport.drawString(w - 562, h - 415, '#Acct-Input-Packets')
+    inpkts = consultaSNMP(agent[0], agent[1], agent[2], '1.3.6.1.2.1.2.2.1.12.41')
+    pdfReport.drawString(w - 562, h - 430, f'{inpkts}')
 
-    pdfReport.drawString(w - 562, h - 505, '#Acct-Authentic')
-    pdfReport.drawString(w - 562, h - 520, '{info}')
+    pdfReport.drawString(w - 562, h - 445, '#Acct-Output-Packets')
+    outpkts = consultaSNMP(agent[0], agent[1], agent[2], '1.3.6.1.2.1.2.2.1.17.41')
+    pdfReport.drawString(w - 562, h - 460, f'{outpkts}')
 
-    pdfReport.drawString(w - 562, h - 535, '#Acct-Session-Time')
-    pdfReport.drawString(w - 562, h - 550, '{info}')
-
-    pdfReport.drawString(w - 562, h - 565, '#Acct-Input-Packets')
-    inpkts = consultaSNMP(agent[0], agent[1], agent[2], '1.3.6.1.2.1.2.2.1.12.1')
-    pdfReport.drawString(w - 562, h - 580, f'{inpkts}')
-
-    pdfReport.drawString(w - 562, h - 595, '#Acct-Output-Packets')
-    outpkts = consultaSNMP(agent[0], agent[1], agent[2], '1.3.6.1.2.1.2.2.1.17.1')
-    pdfReport.drawString(w - 562, h - 610, f'{outpkts}')
-
-    pdfReport.drawString(w - 562, h - 625, '#Acct-Terminate-Cause')
-    pdfReport.drawString(w - 562, h - 640, '{info}')
-
-    pdfReport.drawString(w - 562, h - 655, '#Acct-Multi-Session-Id')
-    pdfReport.drawString(w - 562, h - 670, '{info}')
-
-    pdfReport.drawString(w - 562, h - 685, '#Acct-Link-Count')
-    pdfReport.drawString(w - 562, h - 700, '{info}')
-
-    crearGrafica('agente','ifInUcastPkts', 'Paquetes unicast que ha recibido \nuna interfaz de red de un agente',
+    crearGrafica(agent[0],'ifInUcastPkts', 'Paquetes unicast que ha recibido \nuna interfaz de red de un agente',
                  'Paquetes unicast', '#00EDFF')
-    crearGrafica('agente','ipInReceives', 'Paquetes recibidos a protocolos IP,\n incluyendo los que tienen errores.', 'Paquetes',
+    crearGrafica(agent[0],'ipInReceives', 'Paquetes recibidos a protocolos IP,\n incluyendo los que tienen errores.', 'Paquetes',
                  '#FFDC00')
-    crearGrafica('agente','icmpOutEchos', 'Mensajes ICMP echo que ha\n enviado el agente', 'Mesajes ICMP', '#FF5500')
-    crearGrafica('agente','tcpInSegs', 'Segmentos recibidos, incluyendo los\n que se han recibido con errores', 'Segmentos',
+    crearGrafica(agent[0],'icmpOutEchos', 'Mensajes ICMP echo que ha\n enviado el agente', 'Mesajes ICMP', '#FF5500')
+    crearGrafica(agent[0],'tcpInSegs', 'Segmentos recibidos, incluyendo los\n que se han recibido con errores', 'Segmentos',
                  '#A6FF00')
-    crearGrafica('agente','udpInDatagrams', 'Datagramas entregados a usuarios UDP', 'Datagramas', '#FFA4F8')
+    crearGrafica(agent[0],'udpInDatagrams', 'Datagramas entregados a usuarios UDP', 'Datagramas', '#FFA4F8')
 
     pdfReport.showPage()
     pdfReport.drawImage("RRD/graficas/ifInUcastPkts.png", w - 562, h - 230)

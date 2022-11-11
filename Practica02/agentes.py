@@ -26,18 +26,18 @@ def addAgent():
     file = open("agentes.txt", "a")
 
     index = len(agents)
-    '''
+    
     print(f'Ingresa la información del nuevo agente no. {index}:')
     ip_hostname = input('IP/Hostname:')
     community = input('Comunidad:')
     port = int(input('Puerto:'))
     version =  input('Version SNMP (v1,v2,v3): ')
     '''
-    ip_hostname = 'localhost'
+    ip_hostname = '192.168.1.175'
     port = 161
-    community = 'XeniaMartinez'
+    community = 'XENIA'
     version = 'v1'
-
+    '''
     agents[index] = [ip_hostname, community, port, version]
     file.write(ip_hostname + ',' + community + ',' + str(port) + ',' + version +',\n')
 
@@ -45,14 +45,11 @@ def addAgent():
 
     crearRRD(ip_hostname)
     print('SE CREO LA RRD')
-
-    #exec(open("RRD/updateRRD.py").read())
-    #subprocess.call("RRD/updateRRD.py", shell=True)
+    
     t = Thread(name="updateRRD", target=updateRRD, args=(ip_hostname, community, port))
     t.start()
-
-    print('SE EJECUTO UPDATE')
-
+    print('EL SONDEO COMENZO')
+    
 def deleteAgent():
 
     if getAgents() == -1:
@@ -91,6 +88,3 @@ def getReport():
             print(f'El agente {agent_report} no existe. Intentelo otra vez.')
 
         createPDFReport(agents[agent_report],agent_report)
-
-def stop(self):
-    self._stop.set()

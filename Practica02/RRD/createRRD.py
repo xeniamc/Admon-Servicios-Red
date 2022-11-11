@@ -3,7 +3,7 @@ import rrdtool
 
 def crearRRD(hostname):
 
-    ret = rrdtool.create(f'RRD/agente.rrd',
+    ret = rrdtool.create(f'RRD/{hostname}.rrd',
                          "--start",'N',
                          "--step",'60',
                          "DS:ifInUcastPkts:COUNTER:120:U:U",
